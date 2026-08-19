@@ -1,7 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <queue>
-#include <stack>
 #include <chrono>
 
 using namespace std;
@@ -14,6 +12,7 @@ class Graph
 
 public:
 
+    // Constructor
     Graph(int vertices)
     {
         V = vertices;
@@ -30,10 +29,10 @@ public:
         }
 
         adj[u].push_back(v);
-        adj[v].push_back(u);     // Remove for Directed Graph
+        adj[v].push_back(u);     // Undirected graph
     }
 
-    // Display Adjacency List
+    // Display adjacency list
     void displayGraph()
     {
         cout << "\nAdjacency List\n";
@@ -49,61 +48,67 @@ public:
         }
     }
 
-    // Iterative DFS
-    void DFS(int start)
+    // Iterative DFS using vector as stack
+    vector<int> DFS(int start)
     {
         vector<bool> visited(V, false);
-        stack<int> st;
+        vector<int> result;
+        vector<int> st;
 
-        st.push(start);
-
-        cout << "\nDFS Traversal : ";
+        st.push_back(start);
 
         while (!st.empty())
         {
-            int node = st.top();
-            st.pop();
+            int node = st.back();
+            st.pop_back();
 
             if (!visited[node])
             {
                 visited[node] = true;
-                cout << node << " ";
+                result.push_back(node);
 
-                for (auto it = adj[node].rbegin(); it != adj[node].rend(); ++it)
+                for (auto it = adj[node].rbegin();
+                     it != adj[node].rend(); ++it)
                 {
                     if (!visited[*it])
-                        st.push(*it);
+                        st.push_back(*it);
                 }
             }
         }
+
+        return result;
     }
-        // BFS
-    void BFS(int start)
+
+    // BFS using vector as queue
+    vector<int> BFS(int start)
     {
         vector<bool> visited(V, false);
-        queue<int> q;
+        vector<int> result;
+        vector<int> q;
+
+        int front = 0;
 
         visited[start] = true;
-        q.push(start);
+        q.push_back(start);
 
-        cout << "\nBFS Traversal : ";
-
-        while (!q.empty())
+        while (front < q.size())
         {
-            int node = q.front();
-            q.pop();
+            int node = q[front];
+            front++;
 
-            cout << node << " ";
+            result.push_back(node);
 
             for (int neighbour : adj[node])
             {
                 if (!visited[neighbour])
                 {
                     visited[neighbour] = true;
-                    q.push(neighbour);
+                    q.push_back(neighbour);
                 }
             }
         }
+
+        return result;
     }
 };
 
@@ -114,10 +119,22 @@ int main()
     cout << "Enter number of vertices: ";
     cin >> V;
 
+    if (V <= 0)
+    {
+        cout << "Invalid number of vertices!";
+        return 0;
+    }
+
     Graph g(V);
 
     cout << "Enter number of edges: ";
     cin >> E;
+
+    if (E < 0)
+    {
+        cout << "Invalid number of edges!";
+        return 0;
+    }
 
     cout << "Enter edges (u v):\n";
 
@@ -125,9 +142,11 @@ int main()
     {
         int u, v;
         cin >> u >> v;
+
         g.addEdge(u, v);
     }
 
+    // Display graph
     g.displayGraph();
 
     int start;
@@ -141,28 +160,44 @@ int main()
         return 0;
     }
 
-    // DFS Time Analysis
+    // DFS time
     auto startDFS = high_resolution_clock::now();
 
-    g.DFS(start);
+    vector<int> dfsResult = g.DFS(start);
 
     auto endDFS = high_resolution_clock::now();
 
-    auto dfsTime = duration_cast<nanoseconds>(endDFS - startDFS);
+    auto dfsTime =
+        duration_cast<nanoseconds>(endDFS - startDFS);
 
-    // BFS Time Analysis
+    // BFS time
     auto startBFS = high_resolution_clock::now();
 
-    g.BFS(start);
+    vector<int> bfsResult = g.BFS(start);
 
     auto endBFS = high_resolution_clock::now();
 
-    auto bfsTime = duration_cast<nanoseconds>(endBFS - startBFS);
+    auto bfsTime =
+        duration_cast<nanoseconds>(endBFS - startBFS);
 
+    // Display DFS
+    cout << "\nDFS Traversal : ";
+
+    for (int node : dfsResult)
+        cout << node << " ";
+
+    // Display BFS
+    cout << "\nBFS Traversal : ";
+
+    for (int node : bfsResult)
+        cout << node << " ";
+
+    // Execution time
     cout << "\n\nExecution Time";
     cout << "\nDFS : " << dfsTime.count() << " ns";
     cout << "\nBFS : " << bfsTime.count() << " ns";
 
+    // Complexity
     cout << "\n\nTime Complexity";
     cout << "\nDFS : O(V + E)";
     cout << "\nBFS : O(V + E)";
