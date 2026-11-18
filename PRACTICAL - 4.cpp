@@ -1,3 +1,8 @@
+/*
+ * Program : Performance Analysis of Iterative vs. Recursive Factorial
+ * Purpose : Computes factorial using both methods, measures execution time 
+ *           in nanoseconds, and compares time/space complexity.
+ */
 #include <iostream>
 #include <chrono>   // For high-resolution execution timing
 #include <iomanip>  // For formatting decimal output
