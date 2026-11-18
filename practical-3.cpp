@@ -1,16 +1,21 @@
+/*
+ * Program : Performance Comparison of Max Heap Sort vs. Min Heap Sort
+ * Purpose : Sorts identical random datasets using Max Heap and Min Heap,
+ *           verifies correctness, and compares execution times.
+ *           Time Complexity: O(n log n) | Auxiliary Space: O(1) (In-place)
+ */
+
 #include <iostream>
 #include <vector>
-#include <algorithm>
-#include <chrono>
-#include <random>
-#include <ctime>
+#include <algorithm> // For std::swap, std::reverse, std::is_sorted
+#include <chrono>    // For high-resolution execution timing
+#include <random>    // For mt19937 random number generator
+#include <ctime>     // For time() seed
 
 using namespace std;
 using namespace chrono;
 
-//----------------------------------------------------
-// Function to print array (only for small inputs)
-//----------------------------------------------------
+// Prints array elements (used only when n <= 20 to avoid console clutter)
 void printArray(const vector<int>& arr)
 {
     for (int num : arr)
@@ -18,9 +23,7 @@ void printArray(const vector<int>& arr)
     cout << endl;
 }
 
-//----------------------------------------------------
-// MAX HEAPIFY
-//----------------------------------------------------
+// Restores Max Heap property for subtree rooted at index i | Time: O(log n)
 void maxHeapify(vector<int>& arr, int n, int i)
 {
     int largest = i;
@@ -36,24 +39,20 @@ void maxHeapify(vector<int>& arr, int n, int i)
     if (largest != i)
     {
         swap(arr[i], arr[largest]);
-
-        // Recursively fix affected subtree
-        maxHeapify(arr, n, largest);
+        maxHeapify(arr, n, largest); // Recursively heapify affected subtree
     }
 }
 
-//----------------------------------------------------
-// MAX HEAP SORT
-//----------------------------------------------------
+// Sorts array in ascending order using Max Heap | Time: O(n log n) | Space: O(1)
 void maxHeapSort(vector<int>& arr)
 {
     int n = arr.size();
 
-    // Build Max Heap
+    // Step 1: Build Max Heap starting from last non-leaf node (n/2 - 1) | O(n)
     for (int i = n / 2 - 1; i >= 0; i--)
         maxHeapify(arr, n, i);
 
-    // Extract one element at a time
+    // Step 2: Move root (largest) to end and reduce heap size | O(n log n)
     for (int i = n - 1; i > 0; i--)
     {
         swap(arr[0], arr[i]);
@@ -61,9 +60,7 @@ void maxHeapSort(vector<int>& arr)
     }
 }
 
-//----------------------------------------------------
-// MIN HEAPIFY
-//----------------------------------------------------
+// Restores Min Heap property for subtree rooted at index i | Time: O(log n)
 void minHeapify(vector<int>& arr, int n, int i)
 {
     int smallest = i;
@@ -79,31 +76,27 @@ void minHeapify(vector<int>& arr, int n, int i)
     if (smallest != i)
     {
         swap(arr[i], arr[smallest]);
-
-        // Recursively fix affected subtree
-        minHeapify(arr, n, smallest);
+        minHeapify(arr, n, smallest); // Recursively heapify affected subtree
     }
 }
 
-//----------------------------------------------------
-// MIN HEAP SORT
-//----------------------------------------------------
+// Sorts array in ascending order using Min Heap | Time: O(n log n) | Space: O(1)
 void minHeapSort(vector<int>& arr)
 {
     int n = arr.size();
 
-    // Build Min Heap
+    // Step 1: Build Min Heap starting from last non-leaf node
     for (int i = n / 2 - 1; i >= 0; i--)
         minHeapify(arr, n, i);
 
-    // Extract elements
+    // Step 2: Extract smallest elements to end (produces descending order)
     for (int i = n - 1; i > 0; i--)
     {
         swap(arr[0], arr[i]);
         minHeapify(arr, i, 0);
     }
 
-    // Reverse to get ascending order
+    // Step 3: Reverse array to get ascending order | Time: O(n)
     reverse(arr.begin(), arr.end());
 }
 
@@ -120,51 +113,38 @@ int main()
 
     vector<int> original(n);
 
-    // Modern Random Number Generator
+    // Generate uniform random integers between 1 and 100,000
     mt19937 rng(time(nullptr));
     uniform_int_distribution<int> dist(1, 100000);
 
     for (int i = 0; i < n; i++)
         original[i] = dist(rng);
 
+    // Create identical copies so both algorithms sort the exact same input
     vector<int> maxHeapArray = original;
     vector<int> minHeapArray = original;
-        //----------------------------------------------------
-    // Print Original Array (Only for Small Inputs)
-    //----------------------------------------------------
+
     if (n <= 20)
     {
         cout << "\nOriginal Array:\n";
         printArray(original);
     }
 
-    //----------------------------------------------------
-    // MAX HEAP SORT TIMING
-    //----------------------------------------------------
+    // Measure Max Heap Sort execution time
     auto maxStartTime = high_resolution_clock::now();
-
     maxHeapSort(maxHeapArray);
-
     auto maxEndTime = high_resolution_clock::now();
 
-    //----------------------------------------------------
-    // MIN HEAP SORT TIMING
-    //----------------------------------------------------
+    // Measure Min Heap Sort execution time
     auto minStartTime = high_resolution_clock::now();
-
     minHeapSort(minHeapArray);
-
     auto minEndTime = high_resolution_clock::now();
 
-    //----------------------------------------------------
-    // Verify Sorting
-    //----------------------------------------------------
+    // Verify both arrays are sorted in ascending order
     bool maxSorted = is_sorted(maxHeapArray.begin(), maxHeapArray.end());
     bool minSorted = is_sorted(minHeapArray.begin(), minHeapArray.end());
 
-    //----------------------------------------------------
-    // Time Calculations
-    //----------------------------------------------------
+    // Convert durations into multiple time units
     auto maxNano = duration_cast<nanoseconds>(maxEndTime - maxStartTime);
     auto maxMicro = duration_cast<microseconds>(maxEndTime - maxStartTime);
     auto maxMilli = duration_cast<milliseconds>(maxEndTime - maxStartTime);
@@ -175,9 +155,6 @@ int main()
     auto minMilli = duration_cast<milliseconds>(minEndTime - minStartTime);
     duration<double> minSecond = minEndTime - minStartTime;
 
-    //----------------------------------------------------
-    // Display Sorted Arrays
-    //----------------------------------------------------
     if (n <= 20)
     {
         cout << "\nSorted Array using Max Heap Sort:\n";
@@ -187,46 +164,31 @@ int main()
         printArray(minHeapArray);
     }
 
-    //----------------------------------------------------
-    // MAX HEAP RESULTS
-    //----------------------------------------------------
+    // Display Max Heap Sort results
     cout << "\n=====================================\n";
     cout << "         MAX HEAP SORT\n";
     cout << "=====================================\n";
 
-    cout << "Sorting Status : ";
-    if (maxSorted)
-        cout << "SUCCESS\n";
-    else
-        cout << "FAILED\n";
-
+    cout << "Sorting Status : " << (maxSorted ? "SUCCESS\n" : "FAILED\n");
     cout << "Execution Time\n";
     cout << "Nanoseconds  : " << maxNano.count() << " ns\n";
     cout << "Microseconds : " << maxMicro.count() << " us\n";
     cout << "Milliseconds : " << maxMilli.count() << " ms\n";
     cout << "Seconds      : " << maxSecond.count() << " s\n";
-        //----------------------------------------------------
-    // MIN HEAP RESULTS
-    //----------------------------------------------------
+
+    // Display Min Heap Sort results
     cout << "\n=====================================\n";
     cout << "         MIN HEAP SORT\n";
     cout << "=====================================\n";
 
-    cout << "Sorting Status : ";
-    if (minSorted)
-        cout << "SUCCESS\n";
-    else
-        cout << "FAILED\n";
-
+    cout << "Sorting Status : " << (minSorted ? "SUCCESS\n" : "FAILED\n");
     cout << "Execution Time\n";
     cout << "Nanoseconds  : " << minNano.count() << " ns\n";
     cout << "Microseconds : " << minMicro.count() << " us\n";
     cout << "Milliseconds : " << minMilli.count() << " ms\n";
     cout << "Seconds      : " << minSecond.count() << " s\n";
 
-    //----------------------------------------------------
-    // Complexity Information
-    //----------------------------------------------------
+    // Display theoretical complexity & performance summary
     cout << "\n=====================================\n";
     cout << "      ALGORITHM COMPLEXITY\n";
     cout << "=====================================\n";
@@ -235,9 +197,6 @@ int main()
     cout << "Min Heap Sort Time Complexity : O(n log n)\n";
     cout << "Space Complexity              : O(1)\n";
 
-    //----------------------------------------------------
-    // Performance Comparison
-    //----------------------------------------------------
     cout << "\n=====================================\n";
     cout << "     PERFORMANCE COMPARISON\n";
     cout << "=====================================\n";
