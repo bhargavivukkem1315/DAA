@@ -1,3 +1,10 @@
+/*
+ * Program : 0/1 Knapsack Problem using Dynamic Programming
+ * Purpose : Maximizes total profit within a given weight capacity where each 
+ *           item can either be included (1) or excluded (0).
+ *           Time Complexity: O(n * W) | Space Complexity: O(n * W)
+ */
+
 #include <iostream>
 #include <vector>
 
@@ -24,21 +31,21 @@ int main()
     cout << "Enter maximum weight: ";
     cin >> maxWeight;
 
-    // DP table
-    vector<vector<int>> dp(n + 1,
-                           vector<int>(maxWeight + 1, 0));
+    // DP table where dp[i][w] stores max profit using first i items with capacity w
+    vector<vector<int>> dp(n + 1, vector<int>(maxWeight + 1, 0));
 
-    // Fill DP table
+    // ---------------- BUILD DP TABLE ----------------
     for (int i = 1; i <= n; i++)
     {
         for (int w = 0; w <= maxWeight; w++)
         {
+            // Case 1: Exclude current item (carry forward previous best value)
             dp[i][w] = dp[i - 1][w];
 
+            // Case 2: Include current item if it fits within current capacity w
             if (weight[i - 1] <= w)
             {
-                int take = profit[i - 1]
-                         + dp[i - 1][w - weight[i - 1]];
+                int take = profit[i - 1] + dp[i - 1][w - weight[i - 1]];
 
                 if (take > dp[i][w])
                     dp[i][w] = take;
@@ -46,13 +53,14 @@ int main()
         }
     }
 
-    // Find selected items
+    // ---------------- BACKTRACK SELECTED ITEMS ----------------
+    // Trace backwards from dp[n][maxWeight] to identify which items were included
     vector<int> selected(n, 0);
-
     int w = maxWeight;
 
     for (int i = n; i >= 1; i--)
     {
+        // If profit changed compared to row above, item (i - 1) was included
         if (dp[i][w] != dp[i - 1][w])
         {
             selected[i - 1] = 1;
@@ -60,8 +68,7 @@ int main()
         }
     }
 
-    // ---------------- DP TABLE ----------------
-
+    // ---------------- DISPLAY DP TABLE ----------------
     cout << "\n\n================ KNAPSACK DP TABLE ================\n\n";
 
     cout << "Profit | Available Weight | Maximum Weight\n";
@@ -85,8 +92,7 @@ int main()
 
     cout << "------------------------------------------------------\n";
 
-    // ---------------- SELECTION ----------------
-
+    // ---------------- DISPLAY OPTIMAL SOLUTION ----------------
     cout << "\n\n================ OPTIMAL SOLUTION =================\n\n";
 
     cout << "Profit          : ";
@@ -101,12 +107,11 @@ int main()
     for (int i = 0; i < n; i++)
         cout << selected[i] << "   ";
 
-    // Calculate selected weight and profit
+    // Sum weights and profits of selected items
     int totalWeight = 0;
     int totalProfit = 0;
 
     cout << "\n\nSelected Weights: ";
-
     bool firstWeight = true;
 
     for (int i = 0; i < n; i++)
@@ -117,16 +122,13 @@ int main()
                 cout << " + ";
 
             cout << weight[i];
-
             totalWeight += weight[i];
             firstWeight = false;
         }
     }
-
     cout << " = " << totalWeight;
 
     cout << "\nSelected Profits: ";
-
     bool firstProfit = true;
 
     for (int i = 0; i < n; i++)
@@ -137,12 +139,10 @@ int main()
                 cout << " + ";
 
             cout << profit[i];
-
             totalProfit += profit[i];
             firstProfit = false;
         }
     }
-
     cout << " = " << totalProfit;
 
     cout << "\n\nMaximum Weight : " << maxWeight;
