@@ -1,14 +1,22 @@
+/*
+ * Program : Minimum Spanning Tree (MST) using Prim's Algorithm
+ * Purpose : Finds the MST of a connected, undirected weighted graph represented 
+ *           as an adjacency matrix by greedily growing the tree from vertex 0.
+ *           Time Complexity: O(V^2) | Space Complexity: O(V)
+ */
+
 #include <iostream>
-#include <climits>
+#include <climits> // For INT_MAX
 using namespace std;
 
+// Builds and prints the MST starting from vertex 0 | Time: O(V^2) | Space: O(V)
 void primMST(int graph[][20], int V)
 {
-    int parent[20];       // Stores MST
-    int key[20];          // Minimum edge weight
-    bool inMST[20];       // Checks selected vertices
+    int parent[20]; // Stores parent of each vertex in the constructed MST
+    int key[20];    // Stores minimum edge weight connecting each vertex to MST
+    bool inMST[20]; // Tracks vertices already included in the MST
 
-    // Initialize
+    // Step 1: Initialize all keys to infinity and mark all vertices unvisited
     for (int i = 0; i < V; i++)
     {
         key[i] = INT_MAX;
@@ -16,27 +24,26 @@ void primMST(int graph[][20], int V)
         parent[i] = -1;
     }
 
-    // Start from vertex 0
+    // Start MST construction from vertex 0
     key[0] = 0;
 
-    // MST contains V vertices
+    // Step 2: Include all V vertices into the MST one by one
     for (int count = 0; count < V; count++)
     {
-        // Find vertex with minimum key
+        // Pick unvisited vertex u with the minimum key value
         int u = -1;
-
         for (int v = 0; v < V; v++)
         {
             if (!inMST[v] && (u == -1 || key[v] < key[u]))
                 u = v;
         }
 
-        // Add selected vertex to MST
-        inMST[u] = true;
+        inMST[u] = true; // Add selected vertex u to MST
 
-        // Update adjacent vertices
+        // Step 3: Update key values and parent pointers of adjacent vertices
         for (int v = 0; v < V; v++)
         {
+            // graph[u][v] != 0 ensures an edge exists between u and v
             if (graph[u][v] != 0 &&
                 !inMST[v] &&
                 graph[u][v] < key[v])
@@ -47,7 +54,7 @@ void primMST(int graph[][20], int V)
         }
     }
 
-    // Display MST
+    // Display MST edges and calculate total minimum weight (start from i = 1 since 0 is root)
     int totalWeight = 0;
 
     cout << "\nMinimum Spanning Tree:\n";
@@ -72,8 +79,8 @@ int main()
     cout << "Enter number of vertices: ";
     cin >> V;
 
+    // Read weighted adjacency matrix (0 indicates no direct edge)
     cout << "Enter adjacency matrix:\n";
-
     for (int i = 0; i < V; i++)
     {
         for (int j = 0; j < V; j++)
