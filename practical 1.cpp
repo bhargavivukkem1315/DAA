@@ -1,12 +1,18 @@
+/*
+ * Program : Performance Analysis of Sorting Algorithms
+ * Purpose : Compares execution times (in microseconds) of Bubble, Selection, 
+ *           Insertion, Merge, and Quick Sort on identical random inputs.
+ */
+
 #include <iostream>
 #include <vector>
-#include <cstdlib>
-#include <ctime>
-#include <chrono>
+#include <cstdlib>  // For rand() and srand()
+#include <ctime>    // For time() seed
+#include <chrono>   // For high-resolution execution timing
 using namespace std;
 using namespace std::chrono;
 
-// Bubble Sort 
+// Repeatedly swaps adjacent elements if out of order | Time: O(n^2) | Space: O(1)
 void bubbleSort(vector<int> &numbers)
 {
     int size = numbers.size();
@@ -23,7 +29,7 @@ void bubbleSort(vector<int> &numbers)
     }
 }
 
-//  Selection Sort
+// Selects minimum element from unsorted part and swaps | Time: O(n^2) | Space: O(1)
 void selectionSort(vector<int> &numbers)
 {
     int size = numbers.size();
@@ -44,7 +50,7 @@ void selectionSort(vector<int> &numbers)
     }
 }
 
-//  Insertion Sort 
+// Inserts each element into its correct position in sorted part | Time: O(n^2) | Space: O(1)
 void insertionSort(vector<int> &numbers)
 {
     int size = numbers.size();
@@ -64,7 +70,7 @@ void insertionSort(vector<int> &numbers)
     }
 }
 
-//  Merge sort 
+// Merges two sorted subarrays into one sorted segment | Auxiliary Space: O(n)
 void merge(vector<int> &numbers, int left, int mid, int right)
 {
     int leftSize = mid - left + 1;
@@ -107,6 +113,7 @@ void merge(vector<int> &numbers, int left, int mid, int right)
     }
 }
 
+// Divide & Conquer: recursively splits and merges array | Time: O(n log n) | Space: O(n)
 void mergeSort(vector<int> &numbers, int left, int right)
 {
     if (left < right)
@@ -120,7 +127,7 @@ void mergeSort(vector<int> &numbers, int left, int right)
     }
 }
 
-// Quick sort 
+// Places last element (pivot) in sorted position and partitions array around it
 int partition(vector<int> &numbers, int low, int high)
 {
     int pivot = numbers[high];
@@ -139,6 +146,8 @@ int partition(vector<int> &numbers, int low, int high)
 
     return i + 1;
 }
+
+// Divide & Conquer: partitions around pivot | Avg Time: O(n log n) | Worst: O(n^2) | Space: O(log n)
 void quickSort(vector<int> &numbers, int low, int high)
 {
     if (low < high)
@@ -149,12 +158,13 @@ void quickSort(vector<int> &numbers, int low, int high)
         quickSort(numbers, pivotIndex + 1, high);
     }
 }
+
 int main()
 {
     const int size = 100;
-
     vector<int> numbers(size), copyNumbers;
 
+    // Generate random dataset (0 to 999)
     srand(time(0));
     for (int i = 0; i < size; i++)
     {
@@ -162,61 +172,50 @@ int main()
     }
     cout << "Number of Elements = " << size << "\n\n";
     
+    // Measure Bubble Sort (copyNumbers ensures identical unsorted input for every algorithm)
     auto start = high_resolution_clock::now();
-
     copyNumbers = numbers;
     bubbleSort(copyNumbers);
-
     auto stop = high_resolution_clock::now();
-
     cout << "Bubble Sort Time    : "
          << duration_cast<microseconds>(stop - start).count()
          << " microseconds\n";
 
+    // Measure Selection Sort
     start = high_resolution_clock::now();
-
     copyNumbers = numbers;
     selectionSort(copyNumbers);
-
     stop = high_resolution_clock::now();
-
     cout << "Selection Sort Time : "
          << duration_cast<microseconds>(stop - start).count()
          << " microseconds\n";
          
+    // Measure Insertion Sort
     start = high_resolution_clock::now();
-
     copyNumbers = numbers;
     insertionSort(copyNumbers);
-
     stop = high_resolution_clock::now();
-
     cout << "Insertion Sort Time : "
          << duration_cast<microseconds>(stop - start).count()
          << " microseconds\n";
 
+    // Measure Merge Sort
     start = high_resolution_clock::now();
-
     copyNumbers = numbers;
     mergeSort(copyNumbers, 0, size - 1);
-
     stop = high_resolution_clock::now();
-
     cout << "Merge Sort Time     : "
          << duration_cast<microseconds>(stop - start).count()
          << " microseconds\n";
 
+    // Measure Quick Sort
     start = high_resolution_clock::now();
-
     copyNumbers = numbers;
     quickSort(copyNumbers, 0, size - 1);
-
     stop = high_resolution_clock::now();
-
     cout << "Quick Sort Time     : "
          << duration_cast<microseconds>(stop - start).count()
          << " microseconds\n";
 
     return 0;
 }
-
