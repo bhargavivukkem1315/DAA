@@ -1,3 +1,8 @@
+/*
+ * Program : Coin Change Problem (Greedy vs. Dynamic Programming)
+ * Purpose : Finds minimum coins for a target amount using Greedy (fast, may 
+ *           be suboptimal) and DP (always optimal).
+ */
 #include <iostream>
 #include <algorithm> // For std::min
 using namespace std;
